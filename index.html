@@ -214,13 +214,14 @@
 
   ////
   onRenderFcts.push(function(){
+    video.play();
     if ( video.readyState === video.HAVE_ENOUGH_DATA )
     {
       videoImageContext.drawImage( video, 0, 0,480/2,240/2);
       if(artoolkitMarker.object3d.visible){
-        video.play();
+       // video.play();
       }else{
-        video.pause();
+       // video.pause();
       }
       if ( videoTexture )
         videoTexture.needsUpdate = true;
