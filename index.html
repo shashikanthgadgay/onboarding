@@ -11,6 +11,7 @@
 
 <div style='position: absolute; top: 10px; width:100%; text-align: center; z-index: 1;'>
     <button id="startButtonId"> Play</button>
+    <button id="pauseButtonId"> Pause</button>
 </div>
 
 <script>
@@ -218,28 +219,38 @@
 
 
 
+  var startButton = document.getElementById( 'startButtonId' );
+
+  var pauseButton = document.getElementById( 'pauseButtonId' );
+
+  startButton.onclick = function () {
+    video.play();
+  };
+
+  pauseButton.onclick = function () {
+    video.pause();
+  };
+
+
+
   ////
   onRenderFcts.push(function(){
     if ( video.readyState === video.HAVE_ENOUGH_DATA )
     {
       videoImageContext.drawImage( video, 0, 0,480/2,240/2);
       if(artoolkitMarker.object3d.visible){
-       video.play();
+        // video.play();
+        startButton.onclick();
       }else{
-      video.pause();
+        //video.pause();
+        pauseButton.onclick();
       }
       if ( videoTexture )
         videoTexture.needsUpdate = true;
     }
 
     //mesh.rotation.x += 0.1
-  })
-
-  var startButton = document.getElementById( 'startButtonId' );
-
-  startButton.onclick = function () {
-    video.play();
-  };
+  });
 
 
   //////////////////////////////////////////////////////////////////////////////////
