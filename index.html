@@ -9,6 +9,10 @@
 
 <body style='margin : 0px; overflow: hidden; font-family: Monospace;'>
 
+<div style='position: absolute; top: 10px; width:100%; text-align: center; z-index: 1;'>
+    <button id="startButtonId"> Play</button>
+</div>
+
 <script>
   //////////////////////////////////////////////////////////////////////////////////
   //		Init
@@ -26,6 +30,7 @@
   renderer.domElement.style.top = '0px'
   renderer.domElement.style.left = '0px'
   document.body.appendChild( renderer.domElement );
+
 
   // array of functions for the rendering loop
   var onRenderFcts= [];
@@ -221,7 +226,7 @@
       if(artoolkitMarker.object3d.visible){
        video.play();
       }else{
-       video.pause();
+//       video.pause();
       }
       if ( videoTexture )
         videoTexture.needsUpdate = true;
@@ -229,6 +234,13 @@
 
     //mesh.rotation.x += 0.1
   })
+
+  var startButton = document.getElementById( 'startButtonId' );
+
+  startButton.onclick = function () {
+    video.play();
+  };
+
 
   //////////////////////////////////////////////////////////////////////////////////
   //		render the whole thing on the page
