@@ -2,12 +2,11 @@
 <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 <!-- three.js library -->
 <script src='./js/three.js'></script>
-<script src="./js/stats.min.js"></script>
 <!-- ar.js -->
 <script src="./js/ar.js"></script>
 <script>THREEx.ArToolkitContext.baseURL = '../'</script>
 
-<body style='margin : 0px; overflow: hidden; font-family: Monospace;' onload="startButton.onclick()">
+<body style='margin : 0px; overflow: hidden; font-family: Monospace;'">
 
 <div style='position: absolute; top: 10px; width:100%; text-align: center; z-index: 1;'>
     <button id="startButtonId"> Play</button>
@@ -55,15 +54,7 @@
   var arToolkitSource = new THREEx.ArToolkitSource({
     // to read from the webcam
     sourceType : 'webcam',
-
-    // to read from an image
-    // sourceType : 'image',
-    // sourceUrl : THREEx.ArToolkitContext.baseURL + '../data/images/img.jpg',
-
-    // to read from a video
-    // sourceType : 'video',
-    // sourceUrl : THREEx.ArToolkitContext.baseURL + '../data/videos/headtracking.mp4',
-  })
+  });
 
   arToolkitSource.init(function onReady(){
     onResize()
@@ -111,12 +102,21 @@
   //          Create a ArMarkerControls
   ////////////////////////////////////////////////////////////////////////////////
 
-  var markerRoot = new THREE.Group
-  scene.add(markerRoot)
-  var artoolkitMarker = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+  var markerRoot1 = new THREE.Group
+  markerRoot1.name = 'JOI';
+  scene.add(markerRoot1)
+  var artoolkitMarker1 = new THREEx.ArMarkerControls(arToolkitContext, markerRoot1, {
     type : 'pattern',
     patternUrl : './data/JOI.patt'
-  })
+  });
+
+  var markerRoot2 = new THREE.Group
+  markerRoot2.name = 'hyderabadOffice';
+  scene.add(markerRoot2)
+  var artoolkitMarker2 = new THREEx.ArMarkerControls(arToolkitContext, markerRoot2, {
+    type : 'pattern',
+    patternUrl : './data/hyderabadOffice.patt'
+  });
 
   // build a smoothedControls
   var smoothedRoot = new THREE.Group()
@@ -127,7 +127,8 @@
     lerpScale: 1,
   })
   onRenderFcts.push(function(delta){
-    smoothedControls.update(markerRoot)
+    smoothedControls.update(markerRoot1);
+    smoothedControls.update(markerRoot2);
   })
   //////////////////////////////////////////////////////////////////////////////////
   //		add an object in the scene
@@ -135,47 +136,15 @@
 
   var arWorldRoot = smoothedRoot
 
-  // add a torus knot
-  // var geometry	= new THREE.CubeGeometry(1,1,1);
-  // var material	= new THREE.MeshNormalMaterial({
-  // 	transparent : true,
-  // 	opacity: 0.5,
-  // 	side: THREE.DoubleSide
-  // });
-  // var mesh	= new THREE.Mesh( geometry, material );
-  // mesh.position.y	= geometry.parameters.height/2
-  //arWorldRoot.add( mesh );
 
   var geometry	= new THREE.TorusKnotGeometry(0.3,0.1,64,16);
   var material	= new THREE.MeshNormalMaterial();
   var mesh	= new THREE.Mesh( geometry, material );
   mesh.position.y	= 0.5
-  //arWorldRoot.add( mesh );
-
-
-
-  var floorTexture = new THREE.ImageUtils.loadTexture( 'images/tw.jpg' );
-  floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
-  floorTexture.repeat.set( 1, 1 );
-  // DoubleSide: render texture on both sides of mesh
-  var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-  var floorGeometry = new THREE.PlaneGeometry( 2, 2, 1,1 );
-  var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-  floor.position.y = -0.5;
-  floor.position.x = 1;
-
-  //floor.rotation.x = -Math.PI/2;
-  //arWorldRoot.add(floor);
 
   //// setting Video
   video = document.createElement( 'video' );
-  // video.id = 'video';
-  // video.type = ' video/ogg; codecs="theora, vorbis" ';
-  //  video.src = "https://www.youtube.com/watch?v=60ItHLz5WEA";
-  //  video.src = "http://dl.funsaber.net/animation/Kung.Fu.Panda.2.2011.1080p.Funsaber.mkv";
   video.src = "./videos/JOI.mp4";
-  //  video.src = "https://www.dropbox.com/s/as0d53fspy1a9mu/joi.mp4?dl=0";
-  //  video.src = "https://github.com/jeromeetienne/AR.js/blob/master/data/videos/VID_20160503_165602.mp4?raw=true";
   video.load();
   video.addEventListener('click',function(){ video.play();},false);
   videoImage = document.createElement( 'canvas' );
@@ -184,7 +153,6 @@
   videoImageContext = videoImage.getContext( '2d' );
   // background color if no video present
   videoImageContext.fillStyle = '#000000';
-  // videoImageContext.fillRect( 0, 0, videoImage.width, videoImage.height );
   videoImageContext.fillRect( 0, 0, 10, 1 );
 
   videoTexture = new THREE.Texture( videoImage );
@@ -237,7 +205,7 @@
     if ( video.readyState === video.HAVE_ENOUGH_DATA )
     {
       videoImageContext.drawImage( video, 0, 0,480/2,240/2);
-      if(artoolkitMarker.object3d.visible){
+      if(artoolkitMarker1.object3d.visible || artoolkitMarker2.object3d.visible){
         // video.play();
         startButton.onclick();
       }else{
@@ -255,13 +223,9 @@
   //////////////////////////////////////////////////////////////////////////////////
   //		render the whole thing on the page
   //////////////////////////////////////////////////////////////////////////////////
-  var stats = new Stats();
-  document.body.appendChild( stats.dom );
-  // render the scene
   onRenderFcts.push(function(){
 
     renderer.render( scene, camera );
-    stats.update();
   })
 
   // run the rendering loop
