@@ -6,7 +6,7 @@
 <script src="./js/ar.js"></script>
 <script>THREEx.ArToolkitContext.baseURL = '../'</script>
 
-<body style='margin : 0px; overflow: hidden; font-family: Monospace;'">
+<body style='margin : 0px; overflow: hidden; font-family: Monospace;'>
 
 <div style='position: absolute; top: 10px; width:100%; text-align: center; z-index: 1;'>
     <button id="startButtonId"> Play</button>
@@ -119,28 +119,33 @@
   });
 
   // build a smoothedControls
-  var smoothedRoot = new THREE.Group()
-  scene.add(smoothedRoot)
-  var smoothedControls = new THREEx.ArSmoothedControls(smoothedRoot, {
+  var smoothedRoot1 = new THREE.Group();
+  scene.add(smoothedRoot1)
+  var smoothedControls1 = new THREEx.ArSmoothedControls(smoothedRoot1, {
     lerpPosition: 0.4,
     lerpQuaternion: 0.3,
     lerpScale: 1,
-  })
+  });
+
+  var smoothedRoot2 = new THREE.Group();
+  scene.add(smoothedRoot2)
+  var smoothedControls2 = new THREEx.ArSmoothedControls(smoothedRoot2, {
+    lerpPosition: 0.4,
+    lerpQuaternion: 0.3,
+    lerpScale: 1,
+  });
   onRenderFcts.push(function(delta){
-    smoothedControls.update(markerRoot1);
-    smoothedControls.update(markerRoot2);
-  })
+    smoothedControls1.update(markerRoot1);
+    smoothedControls2.update(markerRoot2);
+  });
+
+
   //////////////////////////////////////////////////////////////////////////////////
   //		add an object in the scene
   //////////////////////////////////////////////////////////////////////////////////
 
-  var arWorldRoot = smoothedRoot
-
-
-  var geometry	= new THREE.TorusKnotGeometry(0.3,0.1,64,16);
-  var material	= new THREE.MeshNormalMaterial();
-  var mesh	= new THREE.Mesh( geometry, material );
-  mesh.position.y	= 0.5
+  var arWorldRoot1 = smoothedRoot1;
+  var arWorldRoot2 = smoothedRoot2;
 
   //// setting Video
   video = document.createElement( 'video' );
@@ -151,7 +156,6 @@
 
 
   videoImageContext = videoImage.getContext( '2d' );
-  // background color if no video present
   videoImageContext.fillStyle = '#000000';
   videoImageContext.fillRect( 0, 0, 10, 1 );
 
@@ -159,9 +163,7 @@
   videoTexture.minFilter = THREE.LinearFilter;
   videoTexture.magFilter = THREE.LinearFilter;
 
-  var movieMaterial = new THREE.MeshBasicMaterial( { map: videoTexture, overdraw: true
-    //, side:THREE.DoubleSide
-  } );
+  var movieMaterial = new THREE.MeshBasicMaterial( { map: videoTexture, overdraw: true } );
 
 
   // the geometry on which the movie will be displayed;
@@ -177,14 +179,15 @@
     opacity: 0.5,
     side: THREE.DoubleSide
   });
-  var mesh	= new THREE.Mesh( geometry, movieMaterial );
-  mesh.position.y	= geometry.parameters.height/2
-  //mesh.rotation.y=-Math.PI;
-  //mesh.rotation.x=Math.PI/2;
-  mesh.position.z=.11;
-  arWorldRoot.add(mesh);
+  var mesh1	= new THREE.Mesh( geometry, movieMaterial );
+  mesh1.position.y	= geometry.parameters.height/2
+  mesh1.position.z=.11;
+  arWorldRoot1.add(mesh1);
 
-
+  var mesh2	= new THREE.Mesh( geometry, movieMaterial );
+  mesh2.position.y	= geometry.parameters.height/2;
+  mesh2.position.z=.11;
+  arWorldRoot2.add(mesh2);
 
   var startButton = document.getElementById( 'startButtonId' );
 
@@ -198,25 +201,18 @@
     video.pause();
   };
 
-
-
-  ////
   onRenderFcts.push(function(){
     if ( video.readyState === video.HAVE_ENOUGH_DATA )
     {
       videoImageContext.drawImage( video, 0, 0,480/2,240/2);
       if(artoolkitMarker1.object3d.visible || artoolkitMarker2.object3d.visible){
-        // video.play();
         startButton.onclick();
       }else{
-        //video.pause();
         pauseButton.onclick();
       }
       if ( videoTexture )
         videoTexture.needsUpdate = true;
     }
-
-    //mesh.rotation.x += 0.1
   });
 
 
